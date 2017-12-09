@@ -39,7 +39,7 @@ return array(
         /**
          * Factory responsible for crawling module dirs and building APIs
          */
-        'kjsencha.apibuilder' => function(ServiceLocatorInterface $sl) {
+        'kjsencha.apibuilder' => function($sl) {
             /* @var $annotationManager AnnotationManager */
             $annotationManager = $sl->get('kjsencha.annotationmanager');
             /* @var $directManager DirectManager */
@@ -51,7 +51,7 @@ return array(
         /**
          * Cache where the API will be stored once it is filled with data
          */
-        'kjsencha.cache' => function(ServiceLocatorInterface $sl) {
+        'kjsencha.cache' => function($sl) {
             $config = $sl->get('Config');
             $storage = StorageFactory::factory($config['kjsencha']['cache']);
             return $storage;
@@ -60,7 +60,7 @@ return array(
          * Bootstrap service that allows rendering of the API into an output that the
          * ExtJs direct manager can understand
          */
-        'kjsencha.bootstrap' => function(ServiceLocatorInterface $sl) {
+        'kjsencha.bootstrap' => function($sl) {
             $config = $sl->get('Config');
             $bootstrap = new Bootstrap($config['kjsencha']['bootstrap']['default']);
             $bootstrap->addVariables(array(
@@ -78,7 +78,7 @@ return array(
         /**
          * Direct manager, handles instantiation of requested services
          */
-        'kjsencha.direct.manager' => function(ServiceManager $sm) {
+        'kjsencha.direct.manager' => function($sm) {
             $directManager = new DirectManager($sm);
             $directManager->addPeeringServiceManager($sm);
 
