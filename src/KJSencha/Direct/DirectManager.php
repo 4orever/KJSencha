@@ -2,6 +2,7 @@
 
 namespace KJSencha\Direct;
 
+use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -12,18 +13,16 @@ class DirectManager extends AbstractPluginManager
 {
     /**
      * DirectManager constructor.
-     * @param ServiceLocatorInterface $sl
+     * @param ContainerInterface|ServiceLocatorInterface $container
+     * @param array $config
      */
-    public function __construct(ServiceLocatorInterface $sl)
+    public function __construct(ContainerInterface $container, array $config = [])
     {
-        parent::__construct();
-        $this->setServiceLocator($sl);
+        parent::__construct($container, $config);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function validatePlugin($plugin)
+    public function validate($instance)
     {
+        return parent::validate($instance);
     }
 }

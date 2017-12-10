@@ -2,9 +2,9 @@
 
 namespace KJSencha\Service;
 
+use Interop\Container\ContainerInterface;
 use Zend\Mvc\Service\ServiceManagerConfig;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\Stdlib\ArrayUtils;
 
 /**
@@ -17,26 +17,21 @@ use Zend\Stdlib\ArrayUtils;
 class ComponentManagerFactory implements FactoryInterface
 {
 
-    /**
-     * @param ServiceLocatorInterface $serviceLocator
-     * @return \KJSencha\Service\ComponentManager
-     */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $serviceConfig = $this->createConfig($serviceLocator);
+        $serviceConfig = $this->createConfig($container);
         $componentManager = new ComponentManager($serviceConfig);
-        $componentManager->addPeeringServiceManager($serviceLocator);
         return $componentManager;
     }
 
     /**
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
      * @return ServiceManagerConfig
      */
-    public function createConfig(ServiceLocatorInterface $serviceLocator)
+    public function createConfig(ContainerInterface $container)
     {
         $config = array();
-        $moduleManager = $serviceLocator->get('ModuleManager');
+        $moduleManager = $container->get('ModuleManager');
 
         foreach ($moduleManager->getLoadedModules() as $module) {
             if (!is_callable(array($module, 'getComponentConfig'))

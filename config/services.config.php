@@ -2,6 +2,7 @@
 
 namespace KJSencha;
 
+use Interop\Container\ContainerInterface;
 use KJSencha\Direct\Remoting\Api\Factory\ApiBuilder;
 use KJSencha\Direct\DirectManager;
 use KJSencha\Service\TestEchoService;
@@ -9,8 +10,6 @@ use KJSencha\Frontend\Bootstrap;
 use Zend\Cache\StorageFactory;
 use Zend\Code\Annotation\AnnotationManager;
 use Zend\Code\Annotation\Parser\DoctrineAnnotationParser;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\ServiceManager\ServiceManager;
 
 return array(
     'factories' => array(
@@ -39,11 +38,11 @@ return array(
         /**
          * Factory responsible for crawling module dirs and building APIs
          */
-        'kjsencha.apibuilder' => function($sl) {
+        'kjsencha.apibuilder' => function(ContainerInterface $container) {
             /* @var $annotationManager AnnotationManager */
-            $annotationManager = $sl->get('kjsencha.annotationmanager');
+            $annotationManager = $container->get('kjsencha.annotationmanager');
             /* @var $directManager DirectManager */
-            $directManager = $sl->get('kjsencha.direct.manager');
+            $directManager = $container->get('kjsencha.direct.manager');
 
             return new ApiBuilder($annotationManager, $directManager);
         },
@@ -51,8 +50,8 @@ return array(
         /**
          * Cache where the API will be stored once it is filled with data
          */
-        'kjsencha.cache' => function($sl) {
-            $config = $sl->get('Config');
+        'kjsencha.cache' => function(ContainerInterface $container) {
+            $config = $container->get('Config');
             $storage = StorageFactory::factory($config['kjsencha']['cache']);
             return $storage;
         },
@@ -60,16 +59,16 @@ return array(
          * Bootstrap service that allows rendering of the API into an output that the
          * ExtJs direct manager can understand
          */
-        'kjsencha.bootstrap' => function($sl) {
-            $config = $sl->get('Config');
+        'kjsencha.bootstrap' => function(ContainerInterface $container) {
+            $config = $container->get('Config');
             $bootstrap = new Bootstrap($config['kjsencha']['bootstrap']['default']);
             $bootstrap->addVariables(array(
                 'App' => array(
-                    'basePath' => $sl->get('Request')->getBasePath(),
+                    'basePath' => $container->get('Request')->getBasePath(),
                 )
             ));
             /* @var $directApi \KJSencha\Direct\Remoting\Api\Api */
-            $directApi = $sl->get('kjsencha.api');
+            $directApi = $container->get('kjsencha.api');
             $bootstrap->setDirectApi($directApi);
 
             return $bootstrap;
@@ -78,9 +77,9 @@ return array(
         /**
          * Direct manager, handles instantiation of requested services
          */
-        'kjsencha.direct.manager' => function($sm) {
-            $directManager = new DirectManager($sm);
-            $directManager->addPeeringServiceManager($sm);
+        'kjsencha.direct.manager' => function(ContainerInterface $container) {
+            $config = $container->get('Config')['kjsencha']['direct'];
+            $directManager = new DirectManager($container, $config);
 
             return $directManager;
         },

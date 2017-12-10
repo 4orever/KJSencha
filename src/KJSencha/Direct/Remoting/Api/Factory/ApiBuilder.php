@@ -49,8 +49,8 @@ class ApiBuilder
             $actions = ArrayUtils::merge($actions, $this->buildDirectoryApi($apiConfig['modules']));
         }
 
-        if (isset($apiConfig['services']) && is_array($apiConfig['services'])) {
-            $actions = ArrayUtils::merge($actions, $this->buildServiceApi($apiConfig['services']));
+        if (isset($apiConfig['api_services']) && is_array($apiConfig['api_services'])) {
+            $actions = ArrayUtils::merge($actions, $this->buildServiceApi($apiConfig['api_services']));
         }
 
         $api = new Api();
@@ -131,7 +131,6 @@ class ApiBuilder
     protected function buildServiceApi(array $services)
     {
         $api = array();
-
         foreach ($services as $name => $serviceName) {
             // @todo validate service name?
             $service = $this->serviceManager->get($serviceName);
@@ -140,7 +139,6 @@ class ApiBuilder
             $action->setObjectName($serviceName);
             $api[$name] = $action;
         }
-
         return $api;
     }
 
